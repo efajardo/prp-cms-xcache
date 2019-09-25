@@ -1,0 +1,145 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: cms-xcache
+  name: cms-xcache-xcache-11-ucsd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: cms-xcache
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        k8s-app: cms-xcache
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - xcache-11.t2.ucsd.edu
+      containers:
+      - env:
+        - name: XC_SITE
+          value: UCSD-XCACHE
+        - name: XC_RAMSIZE
+          value: 24g
+        image: opensciencegrid/cms-xcache:stable
+        imagePullPolicy: Always
+        name: cms-xcache-bcache-1-ucsd
+        resources:
+           limits:
+              memory: 12Gi
+              cpu: 2
+           requests:
+              memory: 10Gi
+              cpu: 2
+        volumeMounts:
+        - mountPath: /etc/osg/image-config.d/00-create-dirs.sh
+          name: configinit
+          subPath: 00-create-dirs.sh
+        - mountPath: /etc/xrootd/config.d/90-node-xcache-11-disks.cfg
+          name: config90
+          subPath: 90-node-xcache-11-disks.cfg
+        - mountPath: /etc/xrootd/config.d/95-local-ucsd.cfg
+          name: config95
+          subPath: 95-local-ucsd.cfg
+        - mountPath: /etc/grid-security/hostcert.pem
+          name: hostcert
+        - mountPath: /etc/grid-security/hostkey.pem
+          name: hostkey
+        - mountPath: /data2
+          name: data2
+        - mountPath: /xcache-root
+          name: localroot
+        - mountPath: /data3
+          name: data3
+        - mountPath: /data4
+          name: data4
+        - mountPath: /data5
+          name: data5
+        - mountPath: /data6
+          name: data6
+        - mountPath: /data7
+          name: data7
+        - mountPath: /data8
+          name: data8
+        - mountPath: /data9
+          name: data9
+        - mountPath: /data10
+          name: data10
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: 00-create-dirs.sh
+            path: 00-create-dirs.sh
+          name: cms-xcache-bcache-1-ucsd
+        name: configinit
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: 90-node-xcache-11-disks.cfg
+            path: 90-node-xcache-11-disks.cfg
+          name: cms-xcache-xcache-11-ucsd
+        name: config90
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: 95-local-ucsd.cfg
+            path: 95-local-ucsd.cfg
+          name: cms-xcache-bcache-1-ucsd
+        name: config95
+      - hostPath:
+          path: /etc/grid-security/hostcert.pem
+          type: File
+        name: hostcert
+      - hostPath:
+          path: /etc/grid-security/hostkey.pem
+          type: File
+        name: hostkey
+      - name: data2
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s2
+      - name: data3
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s3
+      - name: data4
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s4
+      - name: data5
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s5
+      - name: data6
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s6
+      - name: data7
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s7
+      - name: data8
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s8
+      - name: data9
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s9
+      - name: data10
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s10
+      - name: localroot
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s11
