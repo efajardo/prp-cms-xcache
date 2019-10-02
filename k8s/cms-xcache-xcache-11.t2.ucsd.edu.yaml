@@ -39,10 +39,10 @@ spec:
         name: cms-xcache-bcache-1-ucsd
         resources:
            limits:
-              memory: 12Gi
+              memory: 14Gi
               cpu: 2
            requests:
-              memory: 10Gi
+              memory: 12Gi
               cpu: 2
         volumeMounts:
         - mountPath: /etc/osg/image-config.d/00-create-dirs.sh

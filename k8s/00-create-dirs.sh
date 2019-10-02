@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dirNums=($(seq 1 30 ))
+dirNums=($(seq 1 42 ))
 
 for i in ${dirNums[@]}; do
   if [ ! -d "/data${i}" ]; then

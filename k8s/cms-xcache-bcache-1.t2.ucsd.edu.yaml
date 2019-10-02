@@ -120,6 +120,30 @@ spec:
           name: data30
         - mountPath: /data30
           name: data31
+        - mountPath: /data31
+          name: data32
+        - mountPath: /data32
+          name: data33
+        - mountPath: /data33
+          name: data34
+        - mountPath: /data34
+          name: data35
+        - mountPath: /data35
+          name: data36
+        - mountPath: /data36
+          name: data37
+        - mountPath: /data37
+          name: data38
+        - mountPath: /data38
+          name: data39
+        - mountPath: /data39
+          name: data40
+        - mountPath: /data40
+          name: data41
+        - mountPath: /data41
+          name: data42
+        - mountPath: /data42
+          name: data43
       dnsPolicy: ClusterFirst
       hostNetwork: true
       restartPolicy: Always
@@ -285,4 +309,6 @@ spec:
       - name: data42
         persistentVolumeClaim:
           claimName: pvc-bcache-1-ucsd-s43
-
+      - name: data43
+        persistentVolumeClaim:
+          claimName: pvc-bcache-1-ucsd-s44
