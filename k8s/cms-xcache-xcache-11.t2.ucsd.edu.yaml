@@ -32,18 +32,26 @@ spec:
       - env:
         - name: XC_SITE
           value: UCSD-XCACHE
+        - name: XC_RESOURCENAME
+          value: UCSD-XCACHE
         - name: XC_RAMSIZE
-          value: 24g
+          value: 12g
+        - name: XC_PREFETCH
+          value: '0'
+        - name: XC_SPACE_LOW_WM
+          value: '0.95'
+        - name: XC_SPACE_HIGH_WM
+          value: '0.97'
         image: opensciencegrid/cms-xcache:stable
         imagePullPolicy: Always
         name: cms-xcache-bcache-1-ucsd
         resources:
            limits:
-              memory: 14Gi
-              cpu: 2
+              memory: 50Gi
+              cpu: 4
            requests:
-              memory: 12Gi
-              cpu: 2
+              memory: 40Gi
+              cpu: 4
         volumeMounts:
         - mountPath: /etc/osg/image-config.d/00-create-dirs.sh
           name: configinit
@@ -54,6 +62,9 @@ spec:
         - mountPath: /etc/xrootd/config.d/95-local-ucsd.cfg
           name: config95
           subPath: 95-local-ucsd.cfg
+        - mountPath: /etc/xrootd/Authfile-cms-xcache
+          name: authfile
+          subPath: Authfile-cms-xcache
         - mountPath: /etc/grid-security/hostcert.pem
           name: hostcert
         - mountPath: /etc/grid-security/hostkey.pem
@@ -62,6 +73,8 @@ spec:
           name: data2
         - mountPath: /xcache-root
           name: localroot
+        - mountPath: /xcache-meta
+          name: localmeta
         - mountPath: /data3
           name: data3
         - mountPath: /data4
@@ -78,6 +91,8 @@ spec:
           name: data9
         - mountPath: /data10
           name: data10
+        - mountPath: /data11
+          name: data11
       dnsPolicy: ClusterFirst
       hostNetwork: true
       restartPolicy: Always
@@ -105,6 +120,13 @@ spec:
             path: 95-local-ucsd.cfg
           name: cms-xcache-bcache-1-ucsd
         name: config95
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: Authfile-cms-xcache
+            path: Authfile-cms-xcache
+          name: cms-xcache-bcache-1-ucsd
+        name: authfile
       - hostPath:
           path: /etc/grid-security/hostcert.pem
           type: File
@@ -114,32 +136,54 @@ spec:
           type: File
         name: hostkey
       - name: data2
-        persistentVolumeClaim:
-          claimName: pvc-xcache-11-ucsd-s2
+        hostPath:
+          path: /data2
+          type: Directory
       - name: data3
-        persistentVolumeClaim:
-          claimName: pvc-xcache-11-ucsd-s3
+        hostPath:
+          path: /data3
+          type: Directory
       - name: data4
-        persistentVolumeClaim:
-          claimName: pvc-xcache-11-ucsd-s4
+        hostPath:
+          path: /data4
+          type: Directory
       - name: data5
-        persistentVolumeClaim:
-          claimName: pvc-xcache-11-ucsd-s5
+        hostPath:
+          path: /data5
+          type: Directory
       - name: data6
-        persistentVolumeClaim:
-          claimName: pvc-xcache-11-ucsd-s6
+        hostPath:
+          path: /data6
+          type: Directory
       - name: data7
-        persistentVolumeClaim:
-          claimName: pvc-xcache-11-ucsd-s7
+        hostPath:
+          path: /data7
+          type: Directory
       - name: data8
-        persistentVolumeClaim:
-          claimName: pvc-xcache-11-ucsd-s8
+        hostPath:
+          path: /data8
+          type: Directory
       - name: data9
-        persistentVolumeClaim:
-          claimName: pvc-xcache-11-ucsd-s9
+        hostPath:
+          path: /data9
+          type: Directory
       - name: data10
-        persistentVolumeClaim:
-          claimName: pvc-xcache-11-ucsd-s10
+        hostPath:
+          path: /data10
+          type: Directory
+      - name: data11
+        hostPath:
+          path: /data11
+          type: Directory
+      - name: data12
+        hostPath:
+          path: /data12
+          type: Directory
       - name: localroot
-        persistentVolumeClaim:
-          claimName: pvc-xcache-11-ucsd-s11
+        hostPath:
+          path: /xcache-root
+          type: Directory
+      - name: localmeta
+        hostPath:
+          path: /xcache-meta
+          type: Directory

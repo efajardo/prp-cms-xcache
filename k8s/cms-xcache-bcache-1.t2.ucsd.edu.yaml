@@ -33,17 +33,23 @@ spec:
         - name: XC_SITE
           value: UCSD-XCACHE
         - name: XC_RAMSIZE
-          value: 24g
-        image: opensciencegrid/cms-xcache:fresh
+          value: 25g
+        - name: XC_RESOURCENAME
+          value: UCSD-XCACHE
+        - name: XC_SPACE_LOW_WM
+          value: '0.93'
+        - name: XC_SPACE_HIGH_WM
+          value: '0.97'
+        image: opensciencegrid/cms-xcache:stable
         imagePullPolicy: Always
         name: cms-xcache-bcache-1-ucsd
         resources:
            limits:
-              memory: 24Gi
-              cpu: 6
+              memory: 65Gi
+              cpu: 40
            requests:
-              memory: 18Gi
-              cpu: 3
+              memory: 56Gi
+              cpu: 30
         volumeMounts:
         - mountPath: /etc/osg/image-config.d/00-create-dirs.sh
           name: configinit
@@ -54,6 +60,9 @@ spec:
         - mountPath: /etc/xrootd/config.d/95-local-ucsd.cfg
           name: config95
           subPath: 95-local-ucsd.cfg
+        - mountPath: /etc/xrootd/Authfile-cms-xcache
+          name: authfile
+          subPath: Authfile-cms-xcache
         - mountPath: /etc/grid-security/hostcert.pem
           name: hostcert
         - mountPath: /etc/grid-security/hostkey.pem
@@ -63,6 +72,8 @@ spec:
         - mountPath: /data2
           name: data2
         - mountPath: /xcache-root
+          name: localroot
+        - mountPath: /xcache-meta
           name: localroot
         - mountPath: /data3
           name: data4
@@ -144,6 +155,8 @@ spec:
           name: data42
         - mountPath: /data42
           name: data43
+        - mountPath: /data43
+          name: data44
       dnsPolicy: ClusterFirst
       hostNetwork: true
       restartPolicy: Always
@@ -172,6 +185,13 @@ spec:
             path: 95-local-ucsd.cfg
           name: cms-xcache-bcache-1-ucsd
         name: config95
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: Authfile-cms-xcache
+            path: Authfile-cms-xcache
+          name: cms-xcache-bcache-1-ucsd
+        name: authfile
       - hostPath:
           path: /etc/grid-security/hostcert.pem
           type: File
@@ -181,134 +201,186 @@ spec:
           type: File
         name: hostkey
       - name: data1
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s1
+        hostPath:
+          path: /a/1
+          type: Directory
       - name: data2
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s2
-      - name: localroot
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s3
+        hostPath:
+          path: /a/2
+          type: Directory
       - name: data3
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s4
+        hostPath:
+          path: /a/4
+          type: Directory
       - name: data4
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s5
+        hostPath:
+          path: /a/5
+          type: Directory
       - name: data5
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s6
+        hostPath:
+          path: /a/6
+          type: Directory
       - name: data6
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s7
+        hostPath:
+          path: /a/7
+          type: Directory
       - name: data7
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s8
+        hostPath:
+          path: /a/8
+          type: Directory
       - name: data8
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s9
+        hostPath:
+          path: /a/9
+          type: Directory
       - name: data9
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s10
+        hostPath:
+          path: /a/10
+          type: Directory
       - name: data10
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s11
+        hostPath:
+          path: /b/1
+          type: Directory
       - name: data11
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s12
+        hostPath:
+          path: /b/2
+          type: Directory
       - name: data12
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s13
+        hostPath:
+          path: /b/3
+          type: Directory
       - name: data13
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s14
+        hostPath:
+          path: /b/4
+          type: Directory
       - name: data14
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s15
+        hostPath:
+          path: /b/5
+          type: Directory
       - name: data15
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s16
+        hostPath:
+          path: /b/6
+          type: Directory
       - name: data16
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s17
+        hostPath:
+          path: /b/7
+          type: Directory
       - name: data17
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s18
+        hostPath:
+          path: /b/8
+          type: Directory
       - name: data18
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s19
+        hostPath:
+          path: /b/9
+          type: Directory
       - name: data19
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s20
+        hostPath:
+          path: /b/10
+          type: Directory
       - name: data20
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s21
+        hostPath:
+          path: /c/1
+          type: Directory
       - name: data21
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s22
+        hostPath:
+          path: /c/2
+          type: Directory
       - name: data22
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s23
+        hostPath:
+          path: /c/3
+          type: Directory
       - name: data23
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s24
+        hostPath:
+          path: /c/4
+          type: Directory
       - name: data24
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s25
+        hostPath:
+          path: /c/5
+          type: Directory
       - name: data25
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s26
+        hostPath:
+          path: /c/6
+          type: Directory
       - name: data26
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s27
+        hostPath:
+          path: /c/7
+          type: Directory
       - name: data27
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s28
+        hostPath:
+          path: /c/8
+          type: Directory
       - name: data28
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s29
+        hostPath:
+          path: /c/9
+          type: Directory
       - name: data29
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s30
+        hostPath:
+          path: /c/10
+          type: Directory
       - name: data30
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s31
+        hostPath:
+          path: /d/1
+          type: Directory
       - name: data31
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s32
+        hostPath:
+          path: /d/2
+          type: Directory
       - name: data32
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s33
+        hostPath:
+          path: /d/3
+          type: Directory
       - name: data33
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s34
+        hostPath:
+          path: /d/4
+          type: Directory
       - name: data34
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s35
+        hostPath:
+          path: /d/5
+          type: Directory
       - name: data35
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s36
+        hostPath:
+          path: /d/6
+          type: Directory
       - name: data36
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s37
+        hostPath:
+          path: /d/7
+          type: Directory
       - name: data37
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s38
+        hostPath:
+          path: /d/8
+          type: Directory
       - name: data38
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s39
+        hostPath:
+          path: /d/9
+          type: Directory
       - name: data39
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s40
+        hostPath:
+          path: /d/10
+          type: Directory
       - name: data40
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s41
+        hostPath:
+          path: /e/1
+          type: Directory
       - name: data41
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s42
+        hostPath:
+          path: /e/2
+          type: Directory
       - name: data42
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s43
+        hostPath:
+          path: /e/3
+          type: Directory
       - name: data43
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s44
+        hostPath:
+          path: /e/4
+          type: Directory
+      - name: data44
+        hostPath:
+          path: /a/3
+          type: Directory
+      - name: localmeta
+        hostPath:
+          path: /xcache-meta
+          type: Directory
+      - name: localroot
+        hostPath:
+          path: /xcache-meta
+          type: Directory
