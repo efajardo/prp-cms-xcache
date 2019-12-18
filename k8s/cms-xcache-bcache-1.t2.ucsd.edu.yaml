@@ -40,6 +40,8 @@ spec:
           value: '0.93'
         - name: XC_SPACE_HIGH_WM
           value: '0.97'
+        - name: XRD_NETWORKSTACK
+          value: IPv4
         image: opensciencegrid/cms-xcache:stable
         imagePullPolicy: Always
         name: cms-xcache-bcache-1-ucsd
@@ -54,6 +56,9 @@ spec:
         - mountPath: /etc/osg/image-config.d/00-create-dirs.sh
           name: configinit
           subPath: 00-create-dirs.sh
+        - mountPath: /etc/xrootd/config.d/40-cms-xcache-plugin.cfg
+          name: config40
+          subPath: 40-cms-xcache-plugin.cfg
         - mountPath: /etc/xrootd/config.d/90-node-disks.cfg
           name: config90
           subPath: 90-node-disks.cfg
@@ -111,8 +116,6 @@ spec:
           name: data20
         - mountPath: /data20
           name: data21
-        - mountPath: /data21
-          name: data22
         - mountPath: /data22
           name: data23
         - mountPath: /data23
@@ -123,8 +126,6 @@ spec:
           name: data26
         - mountPath: /data26
           name: data27
-        - mountPath: /data27
-          name: data28
         - mountPath: /data28
           name: data29
         - mountPath: /data29
@@ -135,12 +136,6 @@ spec:
           name: data32
         - mountPath: /data32
           name: data33
-        - mountPath: /data33
-          name: data34
-        - mountPath: /data34
-          name: data35
-        - mountPath: /data35
-          name: data36
         - mountPath: /data36
           name: data37
         - mountPath: /data37
@@ -153,8 +148,6 @@ spec:
           name: data41
         - mountPath: /data41
           name: data42
-        - mountPath: /data42
-          name: data43
         - mountPath: /data43
           name: data44
       dnsPolicy: ClusterFirst
@@ -185,6 +178,13 @@ spec:
             path: 95-local-ucsd.cfg
           name: cms-xcache-bcache-1-ucsd
         name: config95
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: 40-stash-cache-plugin.cfg
+            path: 40-cms-xcache-plugin.cfg
+          name: cms-xcache-bcache-1-ucsd
+        name: config40
       - configMap:
           defaultMode: 420
           items:
@@ -284,10 +284,6 @@ spec:
         hostPath:
           path: /c/2
           type: Directory
-      - name: data22
-        hostPath:
-          path: /c/3
-          type: Directory
       - name: data23
         hostPath:
           path: /c/4
@@ -308,10 +304,6 @@ spec:
         hostPath:
           path: /c/8
           type: Directory
-      - name: data28
-        hostPath:
-          path: /c/9
-          type: Directory
       - name: data29
         hostPath:
           path: /c/10
@@ -331,18 +323,6 @@ spec:
       - name: data33
         hostPath:
           path: /d/4
-          type: Directory
-      - name: data34
-        hostPath:
-          path: /d/5
-          type: Directory
-      - name: data35
-        hostPath:
-          path: /d/6
-          type: Directory
-      - name: data36
-        hostPath:
-          path: /d/7
           type: Directory
       - name: data37
         hostPath:
@@ -367,10 +347,6 @@ spec:
       - name: data42
         hostPath:
           path: /e/3
-          type: Directory
-      - name: data43
-        hostPath:
-          path: /e/4
           type: Directory
       - name: data44
         hostPath:
