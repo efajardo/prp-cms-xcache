@@ -40,18 +40,16 @@ spec:
           value: '0.93'
         - name: XC_SPACE_HIGH_WM
           value: '0.97'
-        - name: XRD_NETWORKSTACK
-          value: IPv4
         image: opensciencegrid/cms-xcache:stable
         imagePullPolicy: Always
         name: cms-xcache-bcache-1-ucsd
         resources:
            limits:
               memory: 65Gi
-              cpu: 40
+              cpu: 25
            requests:
               memory: 56Gi
-              cpu: 30
+              cpu: 20
         volumeMounts:
         - mountPath: /etc/osg/image-config.d/00-create-dirs.sh
           name: configinit
@@ -68,6 +66,9 @@ spec:
         - mountPath: /etc/xrootd/Authfile-cms-xcache
           name: authfile
           subPath: Authfile-cms-xcache
+        - mountPath: /etc/supervisord.d/10-cms-xcache.conf
+          name: supervisor10
+          subPath: 10-cms-xcache.conf 
         - mountPath: /etc/grid-security/hostcert.pem
           name: hostcert
         - mountPath: /etc/grid-security/hostkey.pem
@@ -192,6 +193,13 @@ spec:
             path: Authfile-cms-xcache
           name: cms-xcache-bcache-1-ucsd
         name: authfile
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: 10-cms-xcache-ipv4-cmsd.conf
+            path: 10-cms-xcache.conf
+          name: cms-xcache-bcache-1-ucsd
+        name: supervisor10
       - hostPath:
           path: /etc/grid-security/hostcert.pem
           type: File

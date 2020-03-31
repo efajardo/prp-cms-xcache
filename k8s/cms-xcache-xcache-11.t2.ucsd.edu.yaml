@@ -36,15 +36,13 @@ spec:
           value: UCSD-XCACHE
         - name: XC_RAMSIZE
           value: 12g
-        - name: XC_PREFETCH
-          value: '0'
         - name: XC_SPACE_LOW_WM
           value: '0.95'
         - name: XC_SPACE_HIGH_WM
           value: '0.97'
-        image: opensciencegrid/cms-xcache:stable
+        image: opensciencegrid/cms-xcache:fresh
         imagePullPolicy: Always
-        name: cms-xcache-bcache-1-ucsd
+        name: cms-xcache-xcache-11-ucsd
         resources:
            limits:
               memory: 50Gi
@@ -59,12 +57,12 @@ spec:
         - mountPath: /etc/xrootd/config.d/90-node-xcache-11-disks.cfg
           name: config90
           subPath: 90-node-xcache-11-disks.cfg
+        - mountPath: /etc/supervisord.d/10-cms-xcache.conf
+          name: supervisor10
+          subPath: 10-cms-xcache.conf
         - mountPath: /etc/xrootd/config.d/95-local-ucsd.cfg
           name: config95
           subPath: 95-local-ucsd.cfg
-        - mountPath: /etc/xrootd/Authfile-cms-xcache
-          name: authfile
-          subPath: Authfile-cms-xcache
         - mountPath: /etc/grid-security/hostcert.pem
           name: hostcert
         - mountPath: /etc/grid-security/hostkey.pem
@@ -109,6 +107,13 @@ spec:
       - configMap:
           defaultMode: 420
           items:
+          - key: 10-cms-xcache-ipv4-cmsd.conf
+            path: 10-cms-xcache.conf
+          name: cms-xcache-bcache-1-ucsd
+        name: supervisor10
+      - configMap:
+          defaultMode: 420
+          items:
           - key: 90-node-xcache-11-disks.cfg
             path: 90-node-xcache-11-disks.cfg
           name: cms-xcache-xcache-11-ucsd
@@ -120,13 +125,6 @@ spec:
             path: 95-local-ucsd.cfg
           name: cms-xcache-bcache-1-ucsd
         name: config95
-      - configMap:
-          defaultMode: 420
-          items:
-          - key: Authfile-cms-xcache
-            path: Authfile-cms-xcache
-          name: cms-xcache-bcache-1-ucsd
-        name: authfile
       - hostPath:
           path: /etc/grid-security/hostcert.pem
           type: File
