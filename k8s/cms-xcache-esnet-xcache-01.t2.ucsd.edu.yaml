@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     k8s-app: cms-xcache
-  name: cms-xcache-bcache-1-ucsd
+  name: cms-xcache-esnet-xcache-01
 spec:
   replicas: 1
   selector:
@@ -19,29 +19,21 @@ spec:
       labels:
         k8s-app: cms-xcache
     spec:
-      hostname: bcache-1
+      hostname: esnet-xcache-01
       tolerations:
       - effect: NoSchedule
         key: nautilus.io/stashcache
         operator: Exists
       initContainers:
-      - command: ["sh", "-c", "chown -R 10940:10940 /xcache-root /xcache-meta /data*"]
+      - command: ["sh", "-c", "chown -R 10940:10940 /xcache-root"]
         image: busybox
         imagePullPolicy: Always
         name: chowndata
         volumeMounts:
-        - mountPath: /data1
-          name: data1
-        - mountPath: /data2
-          name: data2
-        - mountPath: /data3
-          name: data3
-        - mountPath: /data4
-          name: data4
         - mountPath: /xcache-root
           name: localroot
-        - mountPath: /xcache-meta
-          name: localmeta
+        - mountPath: /var/log/xrootd
+          name: cachelogs
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -50,19 +42,25 @@ spec:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - bcache-1.t2.ucsd.edu
+                - esnet-xcache-01.t2.ucsd.edu
       containers:
       - env:
         - name: XC_SITE
-          value: UCSD-XCACHE
-        - name: XC_RAMSIZE
-          value: 25g
+          value: UCSD-XCACHE-ESNET
         - name: XC_RESOURCENAME
-          value: UCSD-XCACHE
+          value: UCSD-XCACHE-ESNET
+        - name: XC_RAMSIZE
+          value: 12g
         - name: XC_SPACE_LOW_WM
-          value: '0.96'
+          value: '0.95'
         - name: XC_SPACE_HIGH_WM
-          value: '0.98'
+          value: '0.97'
+        - name: XC_FULL_DEBUG
+          value: 'true'
+        - name: LOCAL_CACHE_DIR
+          value: /xcache-root
+        - name: XC_ROOTDIR
+          value: /xcache-root
         image: opensciencegrid/cms-xcache:fresh
         ports:
          - containerPort: 1094
@@ -70,45 +68,33 @@ spec:
          - containerPort: 1095
            hostPort: 1095
         imagePullPolicy: Always
-        imagePullPolicy: Always
-        name: cms-xcache-bcache-1-ucsd
+        name: cms-xcache-esnet-xcache-01
         resources:
            limits:
-              memory: 65Gi
-              cpu: 25
+              memory: 30Gi
+              cpu: 4
            requests:
-              memory: 56Gi
-              cpu: 20
+              memory: 20Gi
+              cpu: 4
         volumeMounts:
-        - mountPath: /etc/xrootd/config.d/90-node-disks.cfg
-          name: config90
-          subPath: 90-node-disks.cfg
+        - mountPath: /etc/supervisord.d/10-cms-xcache.conf
+          name: supervisor10
+          subPath: 10-cms-xcache.conf
         - mountPath: /etc/xrootd/config.d/95-local-ucsd.cfg
           name: config95
           subPath: 95-local-ucsd.cfg
-        - mountPath: /etc/supervisord.d/10-cms-xcache.conf
-          name: supervisor10
-          subPath: 10-cms-xcache.conf 
         - mountPath: /etc/grid-security/hostcert.pem
-          name: hostcert
+          name: certificate
           readOnly: true
           subPath: hostcert.pem
         - mountPath: /etc/grid-security/hostkey.pem
           name: hostkey
           readOnly: true
           subPath: hostkey.pem
-        - mountPath: /data1
-          name: data1
-        - mountPath: /data2
-          name: data2
-        - mountPath: /data3
-          name: data3
-        - mountPath: /data4
-          name: data4
         - mountPath: /xcache-root
           name: localroot
-        - mountPath: /xcache-meta
-          name: localmeta
+        - mountPath: /var/log/xrootd
+          name: cachelogs
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -117,10 +103,10 @@ spec:
       - configMap:
           defaultMode: 420
           items:
-          - key: 90-node-disks.cfg
-            path: 90-node-disks.cfg
+          - key: 10-cms-xcache-ipv4-cmsd.conf
+            path: 10-cms-xcache.conf
           name: cms-xcache-bcache-1-ucsd
-        name: config90
+        name: supervisor10
       - configMap:
           defaultMode: 420
           items:
@@ -128,49 +114,23 @@ spec:
             path: 95-local-ucsd.cfg
           name: cms-xcache-bcache-1-ucsd
         name: config95
-      - configMap:
-          defaultMode: 420
-          items:
-          - key: Authfile-cms-xcache
-            path: Authfile-cms-xcache
-          name: cms-xcache-bcache-1-ucsd
-        name: authfile
-      - configMap:
-          defaultMode: 420
-          items:
-          - key: 10-cms-xcache-ipv4-cmsd.conf
-            path: 10-cms-xcache.conf
-          name: cms-xcache-bcache-1-ucsd
-        name: supervisor10
-      - name: hostcert
+      - name: certificate
         secret:
-          secretName: bcache1-certs
+          secretName: esnet-certs
           items:
           - key: hostcert
             path: hostcert.pem
           defaultMode: 0600
       - name: hostkey
         secret:
-          secretName: bcache1-certs
+          secretName: esnet-certs
           items:
           - key: hostkey
             path: hostkey.pem
           defaultMode: 0600
       - name: localroot
         persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-root
-      - name: localmeta
+          claimName: pvc-esnet-xcache-01-t2-ucsd-edu-persistent-1
+      - name: cachelogs
         persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-meta
-      - name: data1
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s1
-      - name: data2
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s2
-      - name: data3
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s3
-      - name: data4
-        persistentVolumeClaim:
-          claimName: pvc-bcache-1-ucsd-s4
+          claimName: pvc-esnet-xcache-01-t2-ucsd-edu-persistent-2
