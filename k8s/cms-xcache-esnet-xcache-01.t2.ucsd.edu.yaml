@@ -25,12 +25,12 @@ spec:
         key: nautilus.io/stashcache
         operator: Exists
       initContainers:
-      - command: ["sh", "-c", "chown -R 10940:10940 /xcache-root"]
+      - command: ["sh", "-c", "chown -R 10940:10940 /xcache/* "]
         image: busybox
         imagePullPolicy: Always
         name: chowndata
         volumeMounts:
-        - mountPath: /xcache-root
+        - mountPath: /xcache
           name: localroot
         - mountPath: /var/log/xrootd
           name: cachelogs
@@ -45,6 +45,8 @@ spec:
                 - esnet-xcache-01.t2.ucsd.edu
       containers:
       - env:
+        - name: XC_NUM_LOGROTATE
+          value: '15'
         - name: XC_SITE
           value: UCSD-XCACHE-ESNET
         - name: XC_RESOURCENAME
@@ -57,11 +59,9 @@ spec:
           value: '0.97'
         - name: XC_FULL_DEBUG
           value: 'true'
-        - name: LOCAL_CACHE_DIR
-          value: /xcache-root
         - name: XC_ROOTDIR
-          value: /xcache-root
-        image: opensciencegrid/cms-xcache:fresh
+          value: /xcache/namespace
+        image: opensciencegrid/cms-xcache:upcoming-fresh
         ports:
          - containerPort: 1094
            hostPort: 1094
@@ -77,9 +77,6 @@ spec:
               memory: 20Gi
               cpu: 4
         volumeMounts:
-        - mountPath: /etc/supervisord.d/10-cms-xcache.conf
-          name: supervisor10
-          subPath: 10-cms-xcache.conf
         - mountPath: /etc/xrootd/config.d/95-local-ucsd.cfg
           name: config95
           subPath: 95-local-ucsd.cfg
@@ -91,7 +88,7 @@ spec:
           name: hostkey
           readOnly: true
           subPath: hostkey.pem
-        - mountPath: /xcache-root
+        - mountPath: /xcache
           name: localroot
         - mountPath: /var/log/xrootd
           name: cachelogs
@@ -100,13 +97,6 @@ spec:
       schedulerName: default-scheduler
       terminationGracePeriodSeconds: 30
       volumes:
-      - configMap:
-          defaultMode: 420
-          items:
-          - key: 10-cms-xcache-ipv4-cmsd.conf
-            path: 10-cms-xcache.conf
-          name: cms-xcache-bcache-1-ucsd
-        name: supervisor10
       - configMap:
           defaultMode: 420
           items:

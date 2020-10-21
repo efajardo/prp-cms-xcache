@@ -45,10 +45,10 @@ spec:
         name: cms-xcache-xcache-11-ucsd
         resources:
            limits:
-              memory: 50Gi
+              memory: 30Gi
               cpu: 4
            requests:
-              memory: 40Gi
+              memory: 20Gi
               cpu: 4
         volumeMounts:
         - mountPath: /etc/osg/image-config.d/00-create-dirs.sh
@@ -57,9 +57,6 @@ spec:
         - mountPath: /etc/xrootd/config.d/90-node-xcache-11-disks.cfg
           name: config90
           subPath: 90-node-xcache-11-disks.cfg
-        - mountPath: /etc/supervisord.d/10-cms-xcache.conf
-          name: supervisor10
-          subPath: 10-cms-xcache.conf
         - mountPath: /etc/xrootd/config.d/95-local-ucsd.cfg
           name: config95
           subPath: 95-local-ucsd.cfg
@@ -67,8 +64,6 @@ spec:
           name: hostcert
         - mountPath: /etc/grid-security/hostkey.pem
           name: hostkey
-        - mountPath: /data2
-          name: data2
         - mountPath: /xcache-root
           name: localroot
         - mountPath: /xcache-meta
@@ -107,13 +102,6 @@ spec:
       - configMap:
           defaultMode: 420
           items:
-          - key: 10-cms-xcache-ipv4-cmsd.conf
-            path: 10-cms-xcache.conf
-          name: cms-xcache-bcache-1-ucsd
-        name: supervisor10
-      - configMap:
-          defaultMode: 420
-          items:
           - key: 90-node-xcache-11-disks.cfg
             path: 90-node-xcache-11-disks.cfg
           name: cms-xcache-xcache-11-ucsd
@@ -133,10 +121,6 @@ spec:
           path: /etc/grid-security/hostkey.pem
           type: File
         name: hostkey
-      - name: data2
-        hostPath:
-          path: /data2
-          type: Directory
       - name: data3
         hostPath:
           path: /data3
