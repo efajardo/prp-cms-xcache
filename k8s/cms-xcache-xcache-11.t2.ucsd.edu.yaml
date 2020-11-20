@@ -2,13 +2,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    k8s-app: cms-xcache
-  name: cms-xcache-xcache-11-ucsd
+    k8s-app: cms-xcache-11-ucsd
+  name: cms-xcache-11-ucsd
 spec:
   replicas: 1
   selector:
     matchLabels:
-      k8s-app: cms-xcache
+      k8s-app: cms-xcache-11-ucsd
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -17,8 +17,12 @@ spec:
   template:
     metadata:
       labels:
-        k8s-app: cms-xcache
+        k8s-app: cms-xcache-11-ucsd
     spec:
+      tolerations:
+      - effect: NoSchedule
+        key: nautilus.io/stashcache
+        operator: Exists
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -30,8 +34,6 @@ spec:
                 - xcache-11.t2.ucsd.edu
       containers:
       - env:
-        - name: XC_SITE
-          value: UCSD-XCACHE
         - name: XC_RESOURCENAME
           value: UCSD-XCACHE
         - name: XC_RAMSIZE
@@ -40,7 +42,14 @@ spec:
           value: '0.95'
         - name: XC_SPACE_HIGH_WM
           value: '0.97'
-        image: opensciencegrid/cms-xcache:fresh
+        - name: XC_ROOTDIR
+          value: /xcache/namespace
+        image: opensciencegrid/cms-xcache:stable
+        ports:
+         - containerPort: 1094
+           hostPort: 1094
+         - containerPort: 1095
+           hostPort: 1095
         imagePullPolicy: Always
         name: cms-xcache-xcache-11-ucsd
         resources:
@@ -51,12 +60,6 @@ spec:
               memory: 20Gi
               cpu: 4
         volumeMounts:
-        - mountPath: /etc/osg/image-config.d/00-create-dirs.sh
-          name: configinit
-          subPath: 00-create-dirs.sh
-        - mountPath: /etc/xrootd/config.d/90-node-xcache-11-disks.cfg
-          name: config90
-          subPath: 90-node-xcache-11-disks.cfg
         - mountPath: /etc/xrootd/config.d/95-local-ucsd.cfg
           name: config95
           subPath: 95-local-ucsd.cfg
@@ -64,27 +67,25 @@ spec:
           name: hostcert
         - mountPath: /etc/grid-security/hostkey.pem
           name: hostkey
-        - mountPath: /xcache-root
+        - mountPath: /xcache
           name: localroot
-        - mountPath: /xcache-meta
-          name: localmeta
-        - mountPath: /data3
+        - mountPath: /xcache/data3
           name: data3
-        - mountPath: /data4
+        - mountPath: /xcache/data4
           name: data4
-        - mountPath: /data5
+        - mountPath: /xcache/data5
           name: data5
-        - mountPath: /data6
+        - mountPath: /xcache/data6
           name: data6
-        - mountPath: /data7
+        - mountPath: /xcache/data7
           name: data7
-        - mountPath: /data8
+        - mountPath: /xcache/data8
           name: data8
-        - mountPath: /data9
+        - mountPath: /xcache/data9
           name: data9
-        - mountPath: /data10
+        - mountPath: /xcache/data10
           name: data10
-        - mountPath: /data11
+        - mountPath: /xcache/data11
           name: data11
       dnsPolicy: ClusterFirst
       hostNetwork: true
@@ -92,20 +93,6 @@ spec:
       schedulerName: default-scheduler
       terminationGracePeriodSeconds: 30
       volumes:
-      - configMap:
-          defaultMode: 420
-          items:
-          - key: 00-create-dirs.sh
-            path: 00-create-dirs.sh
-          name: cms-xcache-bcache-1-ucsd
-        name: configinit
-      - configMap:
-          defaultMode: 420
-          items:
-          - key: 90-node-xcache-11-disks.cfg
-            path: 90-node-xcache-11-disks.cfg
-          name: cms-xcache-xcache-11-ucsd
-        name: config90
       - configMap:
           defaultMode: 420
           items:
@@ -122,50 +109,34 @@ spec:
           type: File
         name: hostkey
       - name: data3
-        hostPath:
-          path: /data3
-          type: Directory
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s3
       - name: data4
-        hostPath:
-          path: /data4
-          type: Directory
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s4
       - name: data5
-        hostPath:
-          path: /data5
-          type: Directory
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s5
       - name: data6
-        hostPath:
-          path: /data6
-          type: Directory
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s6
       - name: data7
-        hostPath:
-          path: /data7
-          type: Directory
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s7
       - name: data8
-        hostPath:
-          path: /data8
-          type: Directory
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s8
       - name: data9
-        hostPath:
-          path: /data9
-          type: Directory
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s9
       - name: data10
-        hostPath:
-          path: /data10
-          type: Directory
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s10
       - name: data11
-        hostPath:
-          path: /data11
-          type: Directory
-      - name: data12
-        hostPath:
-          path: /data12
-          type: Directory
+        persistentVolumeClaim:
+          claimName: pvc-xcache-11-ucsd-s11
       - name: localroot
         hostPath:
           path: /xcache-root
           type: Directory
-      - name: localmeta
-        hostPath:
-          path: /xcache-meta
-          type: Directory
+
