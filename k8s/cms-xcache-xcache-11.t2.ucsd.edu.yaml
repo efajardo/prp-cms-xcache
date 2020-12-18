@@ -44,7 +44,9 @@ spec:
           value: '0.97'
         - name: XC_ROOTDIR
           value: /xcache/namespace
-        image: opensciencegrid/cms-xcache:stable
+        - name: XC_MULTI_DISK
+          value: 'true'
+        image: opensciencegrid/cms-xcache:fresh
         ports:
          - containerPort: 1094
            hostPort: 1094
@@ -67,7 +69,7 @@ spec:
           name: hostcert
         - mountPath: /etc/grid-security/hostkey.pem
           name: hostkey
-        - mountPath: /xcache
+        - mountPath: /xcache/namespace
           name: localroot
         - mountPath: /xcache/data3
           name: data3

@@ -2,15 +2,9 @@
 
 configmap:
 	-kubectl delete configmap cms-xcache-bcache-1-ucsd -n cms-admin
-	kubectl create configmap cms-xcache-bcache-1-ucsd -n cms-admin \
-		--from-file=90-node-disks.cfg --from-file=95-local-ucsd.cfg --from-file=00-create-dirs.sh
+	kubectl create configmap cms-xcache-bcache-1-ucsd -n cms-admin --from-file=95-local-ucsd.cfg
 	-kubectl delete configmap cms-xcache-bcache-1-ucsd -n osg
-	kubectl create configmap cms-xcache-bcache-1-ucsd -n osg \
-                --from-file=90-node-disks.cfg --from-file=95-local-ucsd.cfg --from-file=00-create-dirs.sh
-	-kubectl delete configmap cms-xcache-xcache-11-ucsd -n osg
-	kubectl create configmap cms-xcache-xcache-11-ucsd -n osg \
-		--from-file=90-node-xcache-11-disks.cfg
-
+	kubectl create configmap cms-xcache-bcache-1-ucsd -n osg --from-file=95-local-ucsd.cfg
 secrets:
 	-kubectl delete secret esnet-certs -n cms-admin
 	kubectl create secret generic esnet-certs -n cms-admin --from-file=hostcert=esnetCerts/hostcert.pem --from-file=hostkey=esnetCerts/hostkey.pem
