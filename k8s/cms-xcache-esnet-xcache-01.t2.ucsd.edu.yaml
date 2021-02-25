@@ -47,12 +47,12 @@ spec:
       - env:
         - name: XC_NUM_LOGROTATE
           value: '15'
-        - name: XC_SITE
+        - name: XC_RESOURCENAME
           value: UCSD-XCACHE-ESNET
         - name: XC_RESOURCENAME
           value: UCSD-XCACHE-ESNET
         - name: XC_RAMSIZE
-          value: 12g
+          value: 15g
         - name: XC_SPACE_LOW_WM
           value: '0.95'
         - name: XC_SPACE_HIGH_WM
@@ -61,7 +61,9 @@ spec:
           value: 'true'
         - name: XC_ROOTDIR
           value: /xcache/namespace
-        image: opensciencegrid/cms-xcache:upcoming-fresh
+        - name: XC_LOCAL_REDIRECTORS
+          value: xcache-redirector-real.t2.ucsd.edu:2041,xcache-real.ultralight.org:2041
+        image: opensciencegrid/cms-xcache:fresh
         ports:
          - containerPort: 1094
            hostPort: 1094

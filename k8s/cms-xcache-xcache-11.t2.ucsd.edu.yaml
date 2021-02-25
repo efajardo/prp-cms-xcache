@@ -46,6 +46,8 @@ spec:
           value: /xcache/namespace
         - name: XC_MULTI_DISK
           value: 'true'
+        - name: XC_LOCAL_REDIRECTORS
+          value: xcache-redirector-real.t2.ucsd.edu:2041,xcache-real.ultralight.org:2041
         image: opensciencegrid/cms-xcache:fresh
         ports:
          - containerPort: 1094
